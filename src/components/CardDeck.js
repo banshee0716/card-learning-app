@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useCallback, useMemo } from "react";
+import React, { useState, useEffect, useCallback, useMemo, useRef } from "react";
 import { useFlashcards } from "../FlashcardContext";
 import Card from "./Card";
 import AddCardForm from "./AddCardForm";
@@ -10,6 +10,309 @@ const CardDeck = () => {
   const [showAddForm, setShowAddForm] = useState(false);
   const [isFlipped, setIsFlipped] = useState(false);
   const [direction, setDirection] = useState(null);
+  const [isAnimating, setIsAnimating] = useState(false);
+  const [isDragging, setIsDragging] = useState(false);
+  const [startX, setStartX] = useState(0);
+  const [currentX, setCurrentX] = useState(0);
+
+  const cardDeckRef = useRef(null);
+
+  const currentCards = useMemo(
+    () => cards[currentTopic] || [],
+    [cards, currentTopic]
+  );
+
+  const resetDeck = useCallback(() => {
+    setCurrentCardIndex(0);
+    setIsFlipped(false);
+    setDirection(null);
+  }, []);
+
+  useEffect(() => {
+    resetDeck();
+  }, [currentTopic, currentCards, resetDeck]);
+
+  const getCardType = (index) => {
+    const totalCards = currentCards.length;
+    const basicThreshold = Math.floor(totalCards * 0.3);
+    const advancedThreshold = Math.floor(totalCards * 0.8);
+
+    if (index < basicThreshold) {
+      return "基礎概念卡";
+    } else if (index < advancedThreshold) {
+      return "深入解析卡";
+    } else {
+      return "關聯整合卡";
+    }
+  };
+
+  const nextCard = useCallback(() => {
+    if (currentCards.length > 0 && !isAnimating) {
+      setIsAnimating(true);
+      setDirection("left");
+      setTimeout(() => {
+        setCurrentCardIndex((prevIndex) => (prevIndex + 1) % currentCards.length);
+        setIsFlipped(false);
+        setTimeout(() => {
+          setIsAnimating(false);
+          setDirection(null);
+        }, 50);
+      }, 300);
+    }
+  }, [currentCards, isAnimating]);
+
+  const prevCard = useCallback(() => {
+    if (currentCards.length > 0 && !isAnimating) {
+      setIsAnimating(true);
+      setDirection("right");
+      setTimeout(() => {
+        setCurrentCardIndex(
+          (prevIndex) => (prevIndex - 1 + currentCards.length) % currentCards.length
+        );
+        setIsFlipped(false);
+        setTimeout(() => {
+          setIsAnimating(false);
+          setDirection(null);
+        }, 50);
+      }, 300);
+    }
+  }, [currentCards, isAnimating]);
+
+  const toggleFlip = useCallback(() => {
+    setIsFlipped((prev) => !prev);
+  }, []);
+
+  const handleKeyDown = useCallback(
+    (event) => {
+      switch (event.key) {
+        case "ArrowLeft":
+          prevCard();
+          break;
+        case "ArrowRight":
+          nextCard();
+          break;
+        case "ArrowUp":
+        case "ArrowDown":
+          toggleFlip();
+          break;
+        default:
+          break;
+      }
+    },
+    [prevCard, nextCard, toggleFlip]
+  );
+
+  useEffect(() => {
+    window.addEventListener("keydown", handleKeyDown);
+    return () => {
+      window.removeEventListener("keydown", handleKeyDown);
+    };
+  }, [handleKeyDown]);
+
+  const handleDelete = useCallback(() => {
+    if (currentCards.length === 0) return;
+
+    if (window.confirm("確定要刪除這張卡片嗎？")) {
+      deleteCard(currentTopic, currentCardIndex);
+      if (currentCardIndex === currentCards.length - 1) {
+        setCurrentCardIndex(Math.max(0, currentCardIndex - 1));
+      }
+    }
+  }, [currentCards, currentTopic, currentCardIndex, deleteCard]);
+
+  const handleAddCard = useCallback(
+    (newCard) => {
+      addCard(currentTopic, newCard);
+      setShowAddForm(false);
+    },
+    [addCard, currentTopic]
+  );
+
+  const handleDragStart = useCallback((e) => {
+    setIsDragging(true);
+    setStartX(e.touches ? e.touches[0].clientX : e.clientX);
+    setCurrentX(0);
+  }, []);
+
+  const handleDragMove = useCallback(
+    (e) => {
+      if (!isDragging) return;
+      const x = e.touches ? e.touches[0].clientX : e.clientX;
+      const diff = x - startX;
+      setCurrentX(diff);
+    },
+    [isDragging, startX]
+  );
+
+  const handleDragEnd = useCallback(() => {
+    setIsDragging(false);
+    if (currentX > 50) {
+      prevCard();
+    } else if (currentX < -50) {
+      nextCard();
+    }
+    setCurrentX(0);
+  }, [currentX, prevCard, nextCard]);
+
+  useEffect(() => {
+    const cardDeck = cardDeckRef.current;
+    if (cardDeck) {
+      cardDeck.addEventListener("touchstart", handleDragStart);
+      cardDeck.addEventListener("touchmove", handleDragMove);
+      cardDeck.addEventListener("touchend", handleDragEnd);
+      cardDeck.addEventListener("mousedown", handleDragStart);
+      cardDeck.addEventListener("mousemove", handleDragMove);
+      cardDeck.addEventListener("mouseup", handleDragEnd);
+      cardDeck.addEventListener("mouseleave", handleDragEnd);
+
+      return () => {
+        cardDeck.removeEventListener("touchstart", handleDragStart);
+        cardDeck.removeEventListener("touchmove", handleDragMove);
+        cardDeck.removeEventListener("touchend", handleDragEnd);
+        cardDeck.removeEventListener("mousedown", handleDragStart);
+        cardDeck.removeEventListener("mousemove", handleDragMove);
+        cardDeck.removeEventListener("mouseup", handleDragEnd);
+        cardDeck.removeEventListener("mouseleave", handleDragEnd);
+      };
+    }
+  }, [handleDragStart, handleDragMove, handleDragEnd]);
+
+  if (currentCards.length === 0) {
+    return (
+      <div className="card-deck-container">
+        <div className="no-cards">沒有卡片，請添加新卡片。</div>
+        <div className="button-group">
+          <button
+            onClick={() => setShowAddForm((prev) => !prev)}
+            className="action-btn"
+          >
+            {showAddForm ? "隱藏表單" : "新增新卡片"}
+          </button>
+        </div>
+        {showAddForm && <AddCardForm onAddCard={handleAddCard} />}
+      </div>
+    );
+  }
+
+  const currentCard = currentCards[currentCardIndex];
+  const prevCardData =
+    currentCardIndex > 0 ? currentCards[currentCardIndex - 1] : null;
+  const nextCardData =
+    currentCardIndex < currentCards.length - 1
+      ? currentCards[currentCardIndex + 1]
+      : null;
+
+  return (
+    <div className="card-deck-container">
+      <div
+        ref={cardDeckRef}
+        className={`card-deck ${direction}`}
+        style={{
+          transform: `translateX(${currentX}px)`,
+          transition: isDragging ? "none" : "transform 0.3s ease",
+        }}
+      >
+        {prevCardData && (
+          <div className="card-wrapper prev-card">
+            <Card
+              front={prevCardData.front}
+              back={prevCardData.back}
+              isFlipped={false}
+              onClick={() => {}}
+              cardType={prevCardData.cardType || getCardType(currentCardIndex - 1)}
+            />
+          </div>
+        )}
+        <div className="card-wrapper current-card">
+          {currentCard ? (
+            <Card
+              front={currentCard.front}
+              back={currentCard.back}
+              isFlipped={isFlipped}
+              onClick={toggleFlip}
+              cardType={currentCard.cardType || getCardType(currentCardIndex)}
+            />
+          ) : (
+            <div className="error-card">無效的卡片數據</div>
+          )}
+        </div>
+        {nextCardData && (
+          <div className="card-wrapper next-card">
+            <Card
+              front={nextCardData.front}
+              back={nextCardData.back}
+              isFlipped={false}
+              onClick={() => {}}
+              cardType={nextCardData.cardType || getCardType(currentCardIndex + 1)}
+            />
+          </div>
+        )}
+      </div>
+      <div className="navigation">
+        <button
+          onClick={prevCard}
+          className="nav-button prev"
+          aria-label="上一張卡片"
+          disabled={currentCards.length <= 1 || isAnimating}
+        >
+          &#8249;
+        </button>
+        <div className="card-count">
+          {currentCardIndex + 1} / {currentCards.length}
+        </div>
+        <button
+          onClick={nextCard}
+          className="nav-button next"
+          aria-label="下一張卡片"
+          disabled={currentCards.length <= 1 || isAnimating}
+        >
+          &#8250;
+        </button>
+        <button
+          onClick={handleDelete}
+          className="nav-button delete"
+          aria-label="刪除卡片"
+          disabled={currentCards.length === 0}
+        >
+          &#128465;
+        </button>
+      </div>
+      <div className="button-group">
+        <button
+          onClick={() => setShowAddForm((prev) => !prev)}
+          className="action-btn"
+        >
+          {showAddForm ? "隱藏表單" : "新增新卡片"}
+        </button>
+      </div>
+      {showAddForm && <AddCardForm onAddCard={handleAddCard} />}
+      <div className="keyboard-instructions">
+        <span>使用鍵盤及滑鼠操作：</span>
+        <br />
+        <span>切換卡片：滑鼠點擊下方標示，或鍵盤← →，或左右拖曳卡片</span>
+        <br />
+        <span>翻轉卡片：滑鼠點擊卡片，或鍵盤↑ ↓</span>
+      </div>
+    </div>
+  );
+};
+
+export default CardDeck;
+
+
+/*import React, { useState, useEffect, useCallback, useMemo } from "react";
+import { useFlashcards } from "../FlashcardContext";
+import Card from "./Card";
+import AddCardForm from "./AddCardForm";
+import "./CardDeck.css";
+
+const CardDeck = () => {
+  const { cards, currentTopic, addCard, deleteCard } = useFlashcards();
+  const [currentCardIndex, setCurrentCardIndex] = useState(0);
+  const [showAddForm, setShowAddForm] = useState(false);
+  const [isFlipped, setIsFlipped] = useState(false);
+  const [direction, setDirection] = useState(null);
+  const [isAnimating, setIsAnimating] = useState(false);
 
   const currentCards = useMemo(
     () => cards[currentTopic] || [],
@@ -30,23 +333,37 @@ const CardDeck = () => {
   }, [currentTopic, currentCards, resetDeck]);
 
   const nextCard = useCallback(() => {
-    if (currentCards.length > 0) {
+    if (currentCards.length > 0 && !isAnimating) {
+      setIsAnimating(true);
       setDirection("left");
-      setCurrentCardIndex((prevIndex) => (prevIndex + 1) % currentCards.length);
-      setIsFlipped(false);
+      setTimeout(() => {
+        setCurrentCardIndex((prevIndex) => (prevIndex + 1) % currentCards.length);
+        setIsFlipped(false);
+        setTimeout(() => {
+          setIsAnimating(false);
+          setDirection(null);
+        }, 50);
+      }, 300);
     }
-  }, [currentCards]);
+  }, [currentCards, isAnimating]);
 
   const prevCard = useCallback(() => {
-    if (currentCards.length > 0) {
+    if (currentCards.length > 0 && !isAnimating) {
+      setIsAnimating(true);
       setDirection("right");
-      setCurrentCardIndex(
-        (prevIndex) =>
-          (prevIndex - 1 + currentCards.length) % currentCards.length
-      );
-      setIsFlipped(false);
+      setTimeout(() => {
+        setCurrentCardIndex(
+          (prevIndex) =>
+            (prevIndex - 1 + currentCards.length) % currentCards.length
+        );
+        setIsFlipped(false);
+        setTimeout(() => {
+          setIsAnimating(false);
+          setDirection(null);
+        }, 50);
+      }, 300);
     }
-  }, [currentCards]);
+  }, [currentCards, isAnimating]);
 
   const toggleFlip = useCallback(() => {
     setIsFlipped((prev) => !prev);
@@ -166,7 +483,7 @@ const CardDeck = () => {
           onClick={prevCard}
           className="nav-button prev"
           aria-label="上一張卡片"
-          disabled={currentCards.length <= 1}
+          disabled={currentCards.length <= 1 || isAnimating}
         >
           &#8249;
         </button>
@@ -177,7 +494,7 @@ const CardDeck = () => {
           onClick={nextCard}
           className="nav-button next"
           aria-label="下一張卡片"
-          disabled={currentCards.length <= 1}
+          disabled={currentCards.length <= 1 || isAnimating}
         >
           &#8250;
         </button>
@@ -211,238 +528,4 @@ const CardDeck = () => {
 };
 
 export default CardDeck;
-
-/*import React, { useState, useEffect, useCallback, useMemo } from 'react';
-import { useFlashcards } from '../FlashcardContext';
-import Card from './Card';
-import AddCardForm from './AddCardForm';
-import './CardDeck.css';
-
-const CardDeck = () => {
-  const { cards, currentTopic, addCard, deleteCard } = useFlashcards();
-  const [currentCardIndex, setCurrentCardIndex] = useState(0);
-  const [showAddForm, setShowAddForm] = useState(false);
-  const [isFlipped, setIsFlipped] = useState(false);
-
-  const currentCards = useMemo(() => cards[currentTopic] || [], [cards, currentTopic]);
-
-  const resetDeck = useCallback(() => {
-    console.log('Resetting deck');
-    setCurrentCardIndex(0);
-    setIsFlipped(false);
-  }, []);
-
-  useEffect(() => {
-    console.log('Current topic changed:', currentTopic);
-    console.log('Current cards:', currentCards);
-    resetDeck();
-  }, [currentTopic, currentCards, resetDeck]);
-
-  const nextCard = useCallback(() => {
-    if (currentCards.length > 0) {
-      setCurrentCardIndex((prevIndex) => (prevIndex + 1) % currentCards.length);
-      setIsFlipped(false);
-    }
-  }, [currentCards]);
-
-  const prevCard = useCallback(() => {
-    if (currentCards.length > 0) {
-      setCurrentCardIndex((prevIndex) => (prevIndex - 1 + currentCards.length) % currentCards.length);
-      setIsFlipped(false);
-    }
-  }, [currentCards]);
-
-  const handleDelete = useCallback(() => {
-    if (currentCards.length === 0) return;
-
-    if (window.confirm('確定要刪除這張卡片嗎？')) {
-      deleteCard(currentTopic, currentCardIndex);
-      if (currentCardIndex === currentCards.length - 1) {
-        setCurrentCardIndex(Math.max(0, currentCardIndex - 1));
-      }
-    }
-  }, [currentCards, currentTopic, currentCardIndex, deleteCard]);
-
-  const handleAddCard = useCallback((newCard) => {
-    addCard(currentTopic, newCard);
-    setShowAddForm(false);
-  }, [addCard, currentTopic]);
-
-  const toggleFlip = useCallback(() => {
-    setIsFlipped((prev) => !prev);
-  }, []);
-
-  if (currentCards.length === 0) {
-    return (
-      <div className="card-deck-container">
-        <div className="no-cards">沒有卡片。請添加新卡片。</div>
-        <div className="button-group">
-          <button onClick={() => setShowAddForm((prev) => !prev)} className="action-btn">
-            {showAddForm ? '隱藏表單' : '添加新卡片'}
-          </button>
-        </div>
-        {showAddForm && <AddCardForm onAddCard={handleAddCard} />}
-      </div>
-    );
-  }
-
-  const currentCard = currentCards[currentCardIndex];
-  console.log('Current card:', currentCard);
-
-  return (
-    <div className="card-deck-container">
-      <div className="card-deck">
-        {currentCard ? (
-          <Card
-            front={currentCard.front}
-            back={currentCard.back}
-            isFlipped={isFlipped}
-            onClick={toggleFlip}
-          />
-        ) : (
-          <div className="error-card">無效的卡片數據</div>
-        )}
-      </div>
-      <div className="navigation">
-        <button
-          onClick={prevCard}
-          className="nav-button prev"
-          aria-label="上一張卡片"
-          disabled={currentCards.length <= 1}
-        >
-          &#8249;
-        </button>
-        <div className="card-count">
-          {currentCardIndex + 1} / {currentCards.length}
-        </div>
-        <button
-          onClick={nextCard}
-          className="nav-button next"
-          aria-label="下一張卡片"
-          disabled={currentCards.length <= 1}
-        >
-          &#8250;
-        </button>
-        <button
-          onClick={handleDelete}
-          className="nav-button delete"
-          aria-label="刪除卡片"
-          disabled={currentCards.length === 0}
-        >
-          &#128465;
-        </button>
-      </div>
-      <div className="button-group">
-        <button onClick={() => setShowAddForm((prev) => !prev)} className="action-btn">
-          {showAddForm ? '隱藏表單' : '添加新卡片'}
-        </button>
-      </div>
-      {showAddForm && <AddCardForm onAddCard={handleAddCard} />}
-    </div>
-  );
-};
-
-export default CardDeck;
-
-/*import React, { useState } from 'react';
-import Card from './Card';
-import AddCardForm from './AddCardForm';
-import { useFlashcards } from '../FlashcardContext';
-import './CardDeck.css';
-
-const CardDeck = () => {
-  const { cards, currentTopic, addCard, deleteCard } = useFlashcards();
-  const [currentCardIndex, setCurrentCardIndex] = useState(0);
-  const [showAddForm, setShowAddForm] = useState(false);
-  const [isFlipped, setIsFlipped] = useState(false);
-
-  const currentCards = cards[currentTopic] || [];
-
-  const nextCard = () => {
-    setCurrentCardIndex((prevIndex) => (prevIndex + 1) % currentCards.length);
-    setIsFlipped(false);
-  };
-
-  const prevCard = () => {
-    setCurrentCardIndex((prevIndex) => (prevIndex - 1 + currentCards.length) % currentCards.length);
-    setIsFlipped(false);
-  };
-
-  const handleDelete = () => {
-    if (window.confirm('確定要刪除這張卡片嗎？')) {
-      deleteCard(currentTopic, currentCardIndex);
-      if (currentCardIndex === currentCards.length - 1) {
-        setCurrentCardIndex(Math.max(0, currentCardIndex - 1));
-      }
-    }
-  };
-
-  const handleAddCard = (newCard) => {
-    addCard(currentTopic, newCard);
-    setShowAddForm(false);
-  };
-
-  const toggleFlip = () => {
-    setIsFlipped(!isFlipped);
-  };
-
-  const renderAdjacentCard = (index, className) => {
-    if (currentCards.length > 1) {
-      const cardIndex = (index + currentCards.length) % currentCards.length;
-      return (
-        <div className={`card-wrapper ${className}`}>
-          <Card {...currentCards[cardIndex]} isFlipped={false} onClick={() => {}} />
-        </div>
-      );
-    }
-    return null;
-  };
-
-  if (currentCards.length === 0) {
-    return (
-      <div className="card-deck-container">
-        <div className="no-cards">沒有卡片，請添加新卡片。</div>
-        <div className="button-group">
-          <button onClick={() => setShowAddForm(!showAddForm)} className="action-btn">
-            {showAddForm ? '隱藏表單' : '添加新卡片'}
-          </button>
-        </div>
-        {showAddForm && <AddCardForm onAddCard={handleAddCard} />}
-      </div>
-    );
-  }
-
-  return (
-    <div className="card-deck-container">
-      <div className="card-deck">
-        {renderAdjacentCard(currentCardIndex - 1, 'prev-card')}
-        <div className="card-wrapper current-card">
-          <Card {...currentCards[currentCardIndex]} isFlipped={isFlipped} onClick={toggleFlip} />
-        </div>
-        {renderAdjacentCard(currentCardIndex + 1, 'next-card')}
-      </div>
-      <div className="navigation">
-        <button onClick={prevCard} className="nav-button prev" aria-label="Previous card">
-          &#8249;
-        </button>
-        <div className="card-count">
-          {currentCardIndex + 1} / {currentCards.length}
-        </div>
-        <button onClick={nextCard} className="nav-button next" aria-label="Next card">
-          &#8250;
-        </button>
-        <button onClick={handleDelete} className="nav-button delete" aria-label="Delete card">
-          &#128465;
-        </button>
-      </div>
-      <div className="button-group">
-        <button onClick={() => setShowAddForm(!showAddForm)} className="action-btn">
-          {showAddForm ? '隱藏表單' : '添加新卡片'}
-        </button>
-      </div>
-      {showAddForm && <AddCardForm onAddCard={handleAddCard} />}
-    </div>
-  );
-};
-
-export default CardDeck;*/
+*/

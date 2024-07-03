@@ -5,6 +5,7 @@
   perspective: 1000px;
   cursor: pointer;
   margin: 20px auto;
+  font-family: 'Noto Sans TC', sans-serif;
 }
 
 .card-inner {
@@ -29,25 +30,23 @@
   flex-direction: column;
   justify-content: flex-start;
   border-radius: 20px;
-  box-shadow: 0 4px 20px rgba(0,0,0,0.1);
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
   padding: 20px;
   box-sizing: border-box;
-  background-color: #ffffff;
   overflow-y: auto;
-  transition: background-color 0.3s, color 0.3s;
+  color: #515454;
 }
 
-.dark-mode .card-face {
-  background-color: #2c2c2e;
-  box-shadow: 0 4px 20px rgba(255,255,255,0.1);
+.card-front.basic-card {
+  background-image: linear-gradient(135deg, #a1c4fd 0%, #c2e9fb 100%);
 }
 
-.card-front {
-  background-image: linear-gradient(120deg, #a1c4fd 0%, #c2e9fb 100%);
+.card-front.advanced-card {
+  background-image: linear-gradient(135deg, #e6fff2 0%, #c1f2d9 100%);
 }
 
-.dark-mode .card-front {
-  background-image: linear-gradient(120deg, #4b6cb7 0%, #182848 100%);
+.card-front.integration-card {
+  background-image: linear-gradient(135deg, #f2e6ff 0%, #d9c1f2 100%);
 }
 
 .card-back {
@@ -55,25 +54,45 @@
   transform: rotateY(180deg);
 }
 
-.dark-mode .card-back {
-  background-image: linear-gradient(120deg, #2c3e50 0%, #34495e 100%);
+.card-type-label {
+  position: absolute;
+  top: 10px;
+  right: 10px;
+  padding: 5px 10px;
+  border-radius: 15px;
+  font-size: 0.8rem;
+  font-weight: bold;
+  color: #ffffff;
+}
+
+.basic-card .card-type-label {
+  background-color: #4a90e2;
+}
+
+.advanced-card .card-type-label {
+  background-color: #27ae60;
+}
+
+.integration-card .card-type-label {
+  background-color: #8e44ad;
 }
 
 .card h2 {
   font-size: 1.8rem;
-  color: #1d1d1f;
+  font-weight: 700;
+  color: #333333;
   margin-bottom: 15px;
+  padding-right: 60px;
 }
 
-.dark-mode .card h2 {
-  color: #f5f5f7;
+.card-content {
+  flex-grow: 1;
+  display: flex;
+  flex-direction: column;
 }
 
-.card-image {
-  max-width: 100%;
-  height: auto;
-  margin-bottom: 15px;
-  border-radius: 10px;
+.card-points {
+  flex-grow: 1;
 }
 
 .card ul {
@@ -83,24 +102,35 @@
 
 .card li {
   font-size: 1.1rem;
-  color: #1d1d1f;
+  font-weight: 400;
   line-height: 1.5;
   margin-bottom: 10px;
 }
 
-.dark-mode .card li {
-  color: #f5f5f7;
+.card-image-container {
+  width: 100%;
+  max-height: 150px;
+  overflow: hidden;
+  margin-top: auto;
+  border-radius: 10px;
+}
+
+.card-image {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  transition: transform 0.3s ease;
+}
+
+.card-image:hover {
+  transform: scale(1.05);
 }
 
 .card p {
   font-size: 1.1rem;
-  color: #1d1d1f;
+  font-weight: 400;
   line-height: 1.5;
   margin-bottom: 15px;
-}
-
-.dark-mode .card p {
-  color: #f5f5f7;
 }
 
 .prompts {
@@ -113,25 +143,75 @@
 
 .prompt h3 {
   font-size: 1.2rem;
+  font-weight: 600;
   color: #0071e3;
   margin-bottom: 5px;
 }
 
-.dark-mode .prompt h3 {
-  color: #4da3ff;
-}
-
 .prompt p {
   font-size: 1rem;
-  color: #515154;
+  font-weight: 400;
   margin: 0;
 }
 
-.dark-mode .prompt p {
-  color: #a1a1a6;
+.image-modal {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background-color: rgba(0, 0, 0, 0.8);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  z-index: 1000;
 }
 
-/* Responsive styles */
+.image-modal img {
+  max-width: 90%;
+  max-height: 90%;
+  object-fit: contain;
+}
+.dark-mode .card-face {
+  color: #b0b0b0;
+}
+
+.dark-mode .card-front.basic-card {
+  background-image: linear-gradient(135deg, #1a3a5f 0%, #2c5282 100%);
+}
+
+.dark-mode .card-front.advanced-card {
+  background-image: linear-gradient(135deg, #1a5f3a 0%, #2c8257 100%);
+}
+
+.dark-mode .card-front.integration-card {
+  background-image: linear-gradient(135deg, #3a1a5f 0%, #5c2c82 100%);
+}
+
+.dark-mode .card-back {
+  background-image: linear-gradient(120deg, #2c3e50 0%, #34495e 100%);
+}
+
+.dark-mode .card h2 {
+  color: #b0b0b0;
+}
+
+.dark-mode .prompt h3 {
+  color: #b0b0b0;
+}
+
+.dark-mode .basic-card .card-type-label {
+  background-color: #63a4ff;
+}
+
+.dark-mode .advanced-card .card-type-label {
+  background-color: #3ebd7e;
+}
+
+.dark-mode .integration-card .card-type-label {
+  background-color: #a855f7;
+}
+/* 響應式樣式 */
 @media (max-width: 768px) {
   .card {
     height: 300px;
@@ -152,6 +232,10 @@
 
   .prompt p {
     font-size: 0.9rem;
+  }
+
+  .card-image-container {
+    max-height: 120px;
   }
 }
 

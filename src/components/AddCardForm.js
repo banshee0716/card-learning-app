@@ -3,31 +3,39 @@ import './AddCardForm.css';
 
 const AddCardForm = ({ onAddCard }) => {
   const [title, setTitle] = useState('');
+  const [imageUrl, setImageUrl] = useState('');
   const [points, setPoints] = useState(['', '', '']);
   const [explanation, setExplanation] = useState('');
   const [metacognitionPrompt, setMetacognitionPrompt] = useState('');
   const [selfExplanationPrompt, setSelfExplanationPrompt] = useState('');
+  const [cardType, setCardType] = useState('基礎概念卡');
 
   const handleSubmit = (e) => {
     e.preventDefault();
+
     const newCard = {
       front: {
         title,
+        image: imageUrl,
         points: points.filter(point => point.trim() !== '')
       },
       back: {
         explanation,
         metacognitionPrompt,
         selfExplanationPrompt
-      }
+      },
+      cardType
     };
+
     onAddCard(newCard);
-    // Reset form
+
     setTitle('');
+    setImageUrl('');
     setPoints(['', '', '']);
     setExplanation('');
     setMetacognitionPrompt('');
     setSelfExplanationPrompt('');
+    setCardType('基礎概念卡');
   };
 
   return (
@@ -39,6 +47,12 @@ const AddCardForm = ({ onAddCard }) => {
         value={title}
         onChange={(e) => setTitle(e.target.value)}
         required
+      />
+      <input
+        type="text"
+        placeholder="圖片 URL"
+        value={imageUrl}
+        onChange={(e) => setImageUrl(e.target.value)}
       />
       {points.map((point, index) => (
         <input
@@ -73,6 +87,15 @@ const AddCardForm = ({ onAddCard }) => {
         onChange={(e) => setSelfExplanationPrompt(e.target.value)}
         required
       />
+      <select
+        value={cardType}
+        onChange={(e) => setCardType(e.target.value)}
+        required
+      >
+        <option value="基礎概念卡">基礎概念卡</option>
+        <option value="深入解析卡">深入解析卡</option>
+        <option value="關聯整合卡">關聯整合卡</option>
+      </select>
       <button type="submit">添加卡片</button>
     </form>
   );
