@@ -1,33 +1,11 @@
-// 導入 React 和必要的 hooks
-// React 是構建用戶界面的 JavaScript 庫
-// useState 用於在函數組件中添加狀態
-// useEffect 用於處理副作用，如數據獲取、訂閱或手動更改 DOM
-// useCallback 用於記憶化函數，避免不必要的重新渲染
-// useMemo 用於記憶化計算結果
-// useRef 用於創建一個可變的 ref 對象
-import React, {
-  useState,
-  useEffect,
-  useCallback,
-  useMemo,
-  useRef,
-} from "react";
-
-// 導入自定義 hook 和組件
+import React, { useState, useEffect, useCallback, useMemo, useRef } from "react";
 import { useFlashcards } from "../FlashcardContext";
 import Card from "./Card";
 import AddCardForm from "./AddCardForm";
-
-// 導入 CSS 文件
 import "./CardDeck.css";
 
-// 定義 CardDeck 函數組件
 const CardDeck = () => {
-  // 使用 useFlashcards hook 獲取全局狀態和方法
   const { cards, currentTopic, addCard, deleteCard } = useFlashcards();
-
-  // 使用 useState hook 定義本地狀態
-  // useState 返回一個數組，第一個元素是當前狀態值，第二個元素是更新狀態的函數
   const [currentCardIndex, setCurrentCardIndex] = useState(0);
   const [showAddForm, setShowAddForm] = useState(false);
   const [isFlipped, setIsFlipped] = useState(false);
@@ -37,43 +15,43 @@ const CardDeck = () => {
   const [startX, setStartX] = useState(0);
   const [currentX, setCurrentX] = useState(0);
 
-  // useRef 創建一個可變的 ref 對象，用於存儲 DOM 元素引用
   const cardDeckRef = useRef(null);
 
-  // useMemo 用於記憶化計算結果，只有當依賴項改變時才重新計算
-  // 這裡用於獲取當前主題的卡片列表
   const currentCards = useMemo(
     () => cards[currentTopic] || [],
     [cards, currentTopic]
   );
 
-  // useCallback 用於記憶化函數，避免在每次渲染時重新創建函數
-  // 這個函數用於重置卡片組狀態
   const resetDeck = useCallback(() => {
-    console.log("Resetting deck");
     setCurrentCardIndex(0);
     setIsFlipped(false);
     setDirection(null);
   }, []);
 
-  // useEffect hook 用於處理副作用
-  // 這個 effect 在 currentTopic 或 currentCards 改變時執行
   useEffect(() => {
-    console.log("Current topic changed:", currentTopic);
-    console.log("Current cards:", currentCards);
     resetDeck();
   }, [currentTopic, currentCards, resetDeck]);
 
-  // 切換到下一張卡片的函數
+  const getCardType = (index) => {
+    const totalCards = currentCards.length;
+    const basicThreshold = Math.floor(totalCards * 0.3);
+    const advancedThreshold = Math.floor(totalCards * 0.8);
+
+    if (index < basicThreshold) {
+      return "基礎概念卡";
+    } else if (index < advancedThreshold) {
+      return "深入解析卡";
+    } else {
+      return "關聯整合卡";
+    }
+  };
+
   const nextCard = useCallback(() => {
     if (currentCards.length > 0 && !isAnimating) {
       setIsAnimating(true);
       setDirection("left");
-      // 使用 setTimeout 來控制動畫時間
       setTimeout(() => {
-        setCurrentCardIndex(
-          (prevIndex) => (prevIndex + 1) % currentCards.length
-        );
+        setCurrentCardIndex((prevIndex) => (prevIndex + 1) % currentCards.length);
         setIsFlipped(false);
         setTimeout(() => {
           setIsAnimating(false);
@@ -83,15 +61,13 @@ const CardDeck = () => {
     }
   }, [currentCards, isAnimating]);
 
-  // 切換到上一張卡片的函數
   const prevCard = useCallback(() => {
     if (currentCards.length > 0 && !isAnimating) {
       setIsAnimating(true);
       setDirection("right");
       setTimeout(() => {
         setCurrentCardIndex(
-          (prevIndex) =>
-            (prevIndex - 1 + currentCards.length) % currentCards.length
+          (prevIndex) => (prevIndex - 1 + currentCards.length) % currentCards.length
         );
         setIsFlipped(false);
         setTimeout(() => {
@@ -102,12 +78,10 @@ const CardDeck = () => {
     }
   }, [currentCards, isAnimating]);
 
-  // 翻轉卡片的函數
   const toggleFlip = useCallback(() => {
     setIsFlipped((prev) => !prev);
   }, []);
 
-  // 處理鍵盤事件的函數
   const handleKeyDown = useCallback(
     (event) => {
       switch (event.key) {
@@ -128,16 +102,13 @@ const CardDeck = () => {
     [prevCard, nextCard, toggleFlip]
   );
 
-  // 添加鍵盤事件監聽器
   useEffect(() => {
     window.addEventListener("keydown", handleKeyDown);
-    // 清理函數：在組件卸載時移除事件監聽器
     return () => {
       window.removeEventListener("keydown", handleKeyDown);
     };
   }, [handleKeyDown]);
 
-  // 處理刪除卡片的函數
   const handleDelete = useCallback(() => {
     if (currentCards.length === 0) return;
 
@@ -149,7 +120,6 @@ const CardDeck = () => {
     }
   }, [currentCards, currentTopic, currentCardIndex, deleteCard]);
 
-  // 處理添加新卡片的函數
   const handleAddCard = useCallback(
     (newCard) => {
       addCard(currentTopic, newCard);
@@ -158,14 +128,12 @@ const CardDeck = () => {
     [addCard, currentTopic]
   );
 
-  // 處理拖曳開始的函數
   const handleDragStart = useCallback((e) => {
     setIsDragging(true);
     setStartX(e.touches ? e.touches[0].clientX : e.clientX);
     setCurrentX(0);
   }, []);
 
-  // 處理拖曳移動的函數
   const handleDragMove = useCallback(
     (e) => {
       if (!isDragging) return;
@@ -176,7 +144,6 @@ const CardDeck = () => {
     [isDragging, startX]
   );
 
-  // 處理拖曳結束的函數
   const handleDragEnd = useCallback(() => {
     setIsDragging(false);
     if (currentX > 50) {
@@ -187,7 +154,6 @@ const CardDeck = () => {
     setCurrentX(0);
   }, [currentX, prevCard, nextCard]);
 
-  // 添加拖曳相關的事件監聽器
   useEffect(() => {
     const cardDeck = cardDeckRef.current;
     if (cardDeck) {
@@ -199,7 +165,6 @@ const CardDeck = () => {
       cardDeck.addEventListener("mouseup", handleDragEnd);
       cardDeck.addEventListener("mouseleave", handleDragEnd);
 
-      // 清理函數：在組件卸載時移除事件監聽器
       return () => {
         cardDeck.removeEventListener("touchstart", handleDragStart);
         cardDeck.removeEventListener("touchmove", handleDragMove);
@@ -212,7 +177,6 @@ const CardDeck = () => {
     }
   }, [handleDragStart, handleDragMove, handleDragEnd]);
 
-  // 如果當前主題沒有卡片，顯示添加卡片的界面
   if (currentCards.length === 0) {
     return (
       <div className="card-deck-container">
@@ -230,7 +194,6 @@ const CardDeck = () => {
     );
   }
 
-  // 獲取當前卡片、前一張卡片和下一張卡片的數據
   const currentCard = currentCards[currentCardIndex];
   const prevCardData =
     currentCardIndex > 0 ? currentCards[currentCardIndex - 1] : null;
@@ -239,10 +202,8 @@ const CardDeck = () => {
       ? currentCards[currentCardIndex + 1]
       : null;
 
-  // 渲染主要的卡片組界面
   return (
     <div className="card-deck-container">
-      {/* 卡片組 */}
       <div
         ref={cardDeckRef}
         className={`card-deck ${direction}`}
@@ -251,18 +212,17 @@ const CardDeck = () => {
           transition: isDragging ? "none" : "transform 0.3s ease",
         }}
       >
-        {/* 前一張卡片 */}
         {prevCardData && (
           <div className="card-wrapper prev-card">
             <Card
               front={prevCardData.front}
               back={prevCardData.back}
               isFlipped={false}
-              onClick={() => { }}
+              onClick={() => {}}
+              cardType={prevCardData.cardType || getCardType(currentCardIndex - 1)}
             />
           </div>
         )}
-        {/* 當前卡片 */}
         <div className="card-wrapper current-card">
           {currentCard ? (
             <Card
@@ -270,24 +230,24 @@ const CardDeck = () => {
               back={currentCard.back}
               isFlipped={isFlipped}
               onClick={toggleFlip}
+              cardType={currentCard.cardType || getCardType(currentCardIndex)}
             />
           ) : (
             <div className="error-card">無效的卡片數據</div>
           )}
         </div>
-        {/* 下一張卡片 */}
         {nextCardData && (
           <div className="card-wrapper next-card">
             <Card
               front={nextCardData.front}
               back={nextCardData.back}
               isFlipped={false}
-              onClick={() => { }}
+              onClick={() => {}}
+              cardType={nextCardData.cardType || getCardType(currentCardIndex + 1)}
             />
           </div>
         )}
       </div>
-      {/* 導航按鈕 */}
       <div className="navigation">
         <button
           onClick={prevCard}
@@ -317,7 +277,6 @@ const CardDeck = () => {
           &#128465;
         </button>
       </div>
-      {/* 添加新卡片按鈕 */}
       <div className="button-group">
         <button
           onClick={() => setShowAddForm((prev) => !prev)}
@@ -326,9 +285,7 @@ const CardDeck = () => {
           {showAddForm ? "隱藏表單" : "新增新卡片"}
         </button>
       </div>
-      {/* 添加新卡片表單 */}
       {showAddForm && <AddCardForm onAddCard={handleAddCard} />}
-      {/* 鍵盤操作說明 */}
       <div className="keyboard-instructions">
         <span>使用鍵盤及滑鼠操作：</span>
         <br />
@@ -340,7 +297,6 @@ const CardDeck = () => {
   );
 };
 
-// 導出 CardDeck 組件，使其可以在其他文件中使用
 export default CardDeck;
 
 

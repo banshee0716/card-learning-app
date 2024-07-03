@@ -2,12 +2,9 @@ import React, { useState, memo } from "react";
 import LazyLoad from "react-lazyload";
 import "./Card.css";
 
-// 使用 React.memo 來優化性能，只有當 props 改變時才重新渲染
-const Card = memo(({ front, back, isFlipped, onClick }) => {
-  // 用於控制圖片模態框的顯示狀態
+const Card = memo(({ front, back, isFlipped, onClick, cardType }) => {
   const [isImageModalOpen, setIsImageModalOpen] = useState(false);
 
-  // 如果卡片數據無效，顯示錯誤消息
   if (!front || !back) {
     return (
       <div className="card error-card">
@@ -16,61 +13,67 @@ const Card = memo(({ front, back, isFlipped, onClick }) => {
     );
   }
 
-  // 打開圖片模態框的處理函數
   const openImageModal = (e) => {
-    e.stopPropagation(); // 防止事件冒泡到卡片的點擊事件
+    e.stopPropagation();
     setIsImageModalOpen(true);
   };
 
-  // 關閉圖片模態框的處理函數
   const closeImageModal = (e) => {
-    e.stopPropagation(); // 防止事件冒泡到卡片的點擊事件
+    e.stopPropagation();
     setIsImageModalOpen(false);
   };
 
+  const getCardTypeClass = () => {
+    switch (cardType) {
+      case "基礎概念卡":
+        return "basic-card";
+      case "深入解析卡":
+        return "advanced-card";
+      case "關聯整合卡":
+        return "integration-card";
+      default:
+        return "";
+    }
+  };
+
   return (
-    <div className={`card ${isFlipped ? "flipped" : ""}`} onClick={onClick}>
+    <div 
+      className={`card ${isFlipped ? "flipped" : ""}`} 
+      onClick={onClick}
+    >
       <div className="card-inner">
-        {/* 卡片正面 */}
-        <div className="card-face card-front">
+        <div className={`card-face card-front ${getCardTypeClass()}`}>
+          <div className="card-type-label">{cardType}</div>
           <h2>{front.title || "無標題"}</h2>
-          {/* 顯示卡片要點，如果沒有則顯示 "沒有要點" */}
-          {front.points && front.points.length > 0 ? (
-            <ul>
-              {front.points.map((point, index) => (
-                <li key={index}>{point}</li>
-              ))}
-            </ul>
-          ) : (
-            <p>沒有要點</p>
-          )}
-          {/* 如果有圖片，使用 LazyLoad 延遲加載 */}
-          {front.image && (
-            <LazyLoad height={150} once>
-              <div className="card-image-container">
-                <img
-                  src={front.image}
-                  alt={front.title || "卡片圖片"}
-                  className="card-image"
-                  onClick={openImageModal}
-                />
-              </div>
-            </LazyLoad>
-          )}
+          <div className="card-content">
+            <div className="card-points">
+              {front.points && front.points.length > 0 ? (
+                <ul>
+                  {front.points.map((point, index) => (
+                    <li key={index}>{point}</li>
+                  ))}
+                </ul>
+              ) : (
+                <p>沒有要點</p>
+              )}
+            </div>
+            {front.image && (
+              <LazyLoad height={150} once>
+                <div className="card-image-container">
+                  <img
+                    src={front.image}
+                    alt={front.title || "卡片圖片"}
+                    className="card-image"
+                    onClick={openImageModal}
+                  />
+                </div>
+              </LazyLoad>
+            )}
+          </div>
         </div>
-        {/* 卡片背面 */}
         <div className="card-face card-back">
+          <div className="card-type-label">{cardType}</div>
           <p>{back.explanation || "沒有解釋"}</p>
-          {/* 如果背面有圖片，也使用 LazyLoad */}
-          {back.image && (
-            <LazyLoad height={150} once>
-              <img
-                src={back.image}
-                alt="Back illustration"
-                className="card-image"
-              />
-            </LazyLoad>
-          )}
           <div className="prompts">
             <div className="prompt">
               <h3>認知提示:</h3>
@@ -83,7 +86,6 @@ const Card = memo(({ front, back, isFlipped, onClick }) => {
           </div>
         </div>
       </div>
-      {/* 圖片模態框 */}
       {isImageModalOpen && (
         <div className="image-modal" onClick={closeImageModal}>
           <img src={front.image} alt={front.title || "卡片圖片"} />
