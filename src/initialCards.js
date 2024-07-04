@@ -4,6 +4,7 @@ export const initialCards = {
       front: {
         title: "光合作用的基本方程式",
         points: ["6CO₂ + 6H₂O → C₆H₁₂O₆ + 6O₂", "需要光能", "在葉綠體中進行"],
+        image:"https://lh5.googleusercontent.com/proxy/8itarnvMNYtEvIEpI7w1tT-l2dUQ9BMZh2Q_Ghdfjmnyv-boOGPkiHSOqK-ub8VNwtu377xipQtsvq6Nm75w34nHT51yhQ",
       },
       back: {
         explanation:

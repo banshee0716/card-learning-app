@@ -12,7 +12,6 @@ const AddCardForm = ({ onAddCard }) => {
 
   const handleSubmit = (e) => {
     e.preventDefault();
-
     const newCard = {
       front: {
         title,
@@ -26,9 +25,8 @@ const AddCardForm = ({ onAddCard }) => {
       },
       cardType
     };
-
     onAddCard(newCard);
-
+    // Reset form fields
     setTitle('');
     setImageUrl('');
     setPoints(['', '', '']);
@@ -41,6 +39,31 @@ const AddCardForm = ({ onAddCard }) => {
   return (
     <form onSubmit={handleSubmit} className="add-card-form">
       <h2>添加新卡片</h2>
+      
+      <div className="card-type-buttons">
+        <button 
+          type="button" 
+          className={`card-type-btn basic ${cardType === '基礎概念卡' ? 'active' : ''}`}
+          onClick={() => setCardType('基礎概念卡')}
+        >
+          基礎概念卡
+        </button>
+        <button 
+          type="button" 
+          className={`card-type-btn advanced ${cardType === '深入解析卡' ? 'active' : ''}`}
+          onClick={() => setCardType('深入解析卡')}
+        >
+          深入解析卡
+        </button>
+        <button 
+          type="button" 
+          className={`card-type-btn integration ${cardType === '關聯整合卡' ? 'active' : ''}`}
+          onClick={() => setCardType('關聯整合卡')}
+        >
+          關聯整合卡
+        </button>
+      </div>
+
       <input
         type="text"
         placeholder="標題"
@@ -87,15 +110,6 @@ const AddCardForm = ({ onAddCard }) => {
         onChange={(e) => setSelfExplanationPrompt(e.target.value)}
         required
       />
-      <select
-        value={cardType}
-        onChange={(e) => setCardType(e.target.value)}
-        required
-      >
-        <option value="基礎概念卡">基礎概念卡</option>
-        <option value="深入解析卡">深入解析卡</option>
-        <option value="關聯整合卡">關聯整合卡</option>
-      </select>
       <button type="submit">添加卡片</button>
     </form>
   );

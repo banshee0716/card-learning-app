@@ -32,6 +32,7 @@ const CardDeck = () => {
     resetDeck();
   }, [currentTopic, currentCards, resetDeck]);
 
+  //之後重寫，這部分處理很差，改寫Initial card的內容讓他可以自己寫入
   const getCardType = (index) => {
     const totalCards = currentCards.length;
     const basicThreshold = Math.floor(totalCards * 0.3);
