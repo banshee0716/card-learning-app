@@ -37,10 +37,7 @@ const Card = memo(({ front, back, isFlipped, onClick, cardType }) => {
   };
 
   return (
-    <div 
-      className={`card ${isFlipped ? "flipped" : ""}`} 
-      onClick={onClick}
-    >
+    <div className={`card ${isFlipped ? "flipped" : ""}`} onClick={onClick}>
       <div className="card-inner">
         <div className={`card-face card-front ${getCardTypeClass()}`}>
           <div className="card-type-label">{cardType}</div>
@@ -72,15 +69,15 @@ const Card = memo(({ front, back, isFlipped, onClick, cardType }) => {
           </div>
         </div>
         <div className="card-face card-back">
-          <div className="card-type-label">{cardType}</div>
           <p>{back.explanation || "沒有解釋"}</p>
           <div className="prompts">
+            <div className="prompt-title">認知提示:</div>
             <div className="prompt">
-              <h3>認知提示:</h3>
               <p>{back.metacognitionPrompt || "沒有認知提示"}</p>
             </div>
+
+            <div className="prompt-title">自我解釋提示:</div>
             <div className="prompt">
-              <h3>自我解釋提示:</h3>
               <p>{back.selfExplanationPrompt || "沒有自我解釋提示"}</p>
             </div>
           </div>

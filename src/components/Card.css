@@ -5,7 +5,7 @@
   perspective: 1000px;
   cursor: pointer;
   margin: 20px auto;
-  font-family: 'Noto Sans TC', sans-serif;
+  font-family: "Noto Sans TC", sans-serif;
 }
 
 .card-inner {
@@ -42,11 +42,11 @@
 }
 
 .card-front.advanced-card {
-  background-image: linear-gradient(135deg, #e6fff2 0%, #c1f2d9 100%);
+  background-image: linear-gradient(135deg, #e6fff2 0%, #94f2c2 100%);
 }
 
 .card-front.integration-card {
-  background-image: linear-gradient(135deg, #f2e6ff 0%, #d9c1f2 100%);
+  background-image: linear-gradient(135deg, #e5ceff 0%, #c79df5 100%);
 }
 
 .card-back {
@@ -62,7 +62,7 @@
   border-radius: 15px;
   font-size: 0.8rem;
   font-weight: bold;
-  color: #ffffff;
+  color: #fdfbfb;
 }
 
 .basic-card .card-type-label {
@@ -70,17 +70,17 @@
 }
 
 .advanced-card .card-type-label {
-  background-color: #27ae60;
+  background-color: #41c97a;
 }
 
 .integration-card .card-type-label {
-  background-color: #8e44ad;
+  background-color: #954eb4;
 }
 
 .card h2 {
   font-size: 1.8rem;
   font-weight: 700;
-  color: #333333;
+  color: #515454;
   margin-bottom: 15px;
   padding-right: 60px;
 }
@@ -134,24 +134,37 @@
 }
 
 .prompts {
-  margin-top: 20px;
+  margin-top: 15px; /* 減少與上方內容的間距 */
 }
 
 .prompt {
   margin-bottom: 15px;
+  background-color: rgba(0, 0, 0, 0.03);
+  padding: 10px 15px; /* 減少內部padding */
+  border-radius: 10px;
 }
 
 .prompt h3 {
-  font-size: 1.2rem;
+  font-size: 1.1rem; /* 稍微減小字體大小 */
   font-weight: 600;
-  color: #0071e3;
-  margin-bottom: 5px;
+  color: #333333;
+  margin-bottom: 5px; /* 減少標題和內容之間的間距 */
+  margin-top: 0; /* 移除頂部間距 */
 }
 
 .prompt p {
-  font-size: 1rem;
+  font-size: 0.95rem; /* 稍微減小字體大小 */
   font-weight: 400;
   margin: 0;
+  color: #515454;
+}
+
+/* 新增樣式，用於提示標題 */
+.prompt-title {
+  font-size: 1.3rem;
+  font-weight: 600;
+  color: #0071e3;
+  margin-bottom: 5px; /* 在標題和提示區塊之間添加一些間距 */
 }
 
 .image-modal {
@@ -196,10 +209,19 @@
   color: #b0b0b0;
 }
 
+/* 深色模式的調整 */
+.dark-mode .prompt {
+  background-color: rgba(255, 255, 255, 0.05);
+}
+
+.dark-mode .prompt-title,
 .dark-mode .prompt h3 {
   color: #b0b0b0;
 }
 
+.dark-mode .prompt p {
+  color: #e0e0e0;
+}
 .dark-mode .basic-card .card-type-label {
   background-color: #63a4ff;
 }
@@ -211,6 +233,7 @@
 .dark-mode .integration-card .card-type-label {
   background-color: #a855f7;
 }
+
 /* 響應式樣式 */
 @media (max-width: 768px) {
   .card {

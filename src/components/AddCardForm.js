@@ -1,46 +1,75 @@
-import React, { useState } from 'react';
-import './AddCardForm.css';
+import React, { useState } from "react";
+import "./AddCardForm.css";
 
 const AddCardForm = ({ onAddCard }) => {
-  const [title, setTitle] = useState('');
-  const [imageUrl, setImageUrl] = useState('');
-  const [points, setPoints] = useState(['', '', '']);
-  const [explanation, setExplanation] = useState('');
-  const [metacognitionPrompt, setMetacognitionPrompt] = useState('');
-  const [selfExplanationPrompt, setSelfExplanationPrompt] = useState('');
-  const [cardType, setCardType] = useState('基礎概念卡');
+  const [title, setTitle] = useState("");
+  const [imageUrl, setImageUrl] = useState("");
+  const [points, setPoints] = useState(["", "", ""]);
+  const [explanation, setExplanation] = useState("");
+  const [metacognitionPrompt, setMetacognitionPrompt] = useState("");
+  const [selfExplanationPrompt, setSelfExplanationPrompt] = useState("");
+  const [cardType, setCardType] = useState("基礎概念卡");
 
   const handleSubmit = (e) => {
     e.preventDefault();
-
     const newCard = {
       front: {
         title,
         image: imageUrl,
-        points: points.filter(point => point.trim() !== '')
+        points: points.filter((point) => point.trim() !== ""),
       },
       back: {
         explanation,
         metacognitionPrompt,
-        selfExplanationPrompt
+        selfExplanationPrompt,
       },
-      cardType
+      cardType, // 新增這一行，將卡片類型加入新卡片數據中
     };
-
     onAddCard(newCard);
-
-    setTitle('');
-    setImageUrl('');
-    setPoints(['', '', '']);
-    setExplanation('');
-    setMetacognitionPrompt('');
-    setSelfExplanationPrompt('');
-    setCardType('基礎概念卡');
+    // 重置表單欄位
+    setTitle("");
+    setImageUrl("");
+    setPoints(["", "", ""]);
+    setExplanation("");
+    setMetacognitionPrompt("");
+    setSelfExplanationPrompt("");
+    setCardType("基礎概念卡");
   };
 
   return (
     <form onSubmit={handleSubmit} className="add-card-form">
       <h2>添加新卡片</h2>
+
+      <div className="card-type-buttons">
+        <button
+          type="button"
+          className={`card-type-btn basic ${
+            cardType === "基礎概念卡" ? "active" : ""
+          }`}
+          onClick={() => setCardType("基礎概念卡")}
+        >
+          基礎概念卡
+        </button>
+        <button
+          type="button"
+          className={`card-type-btn advanced ${
+            cardType === "深入解析卡" ? "active" : ""
+          }`}
+          onClick={() => setCardType("深入解析卡")}
+        >
+          深入解析卡
+        </button>
+        <button
+          type="button"
+          className={`card-type-btn integration ${
+            cardType === "關聯整合卡" ? "active" : ""
+          }`}
+          onClick={() => setCardType("關聯整合卡")}
+        >
+          關聯整合卡
+        </button>
+      </div>
+
       <input
         type="text"
         placeholder="標題"
@@ -87,15 +116,6 @@ const AddCardForm = ({ onAddCard }) => {
         onChange={(e) => setSelfExplanationPrompt(e.target.value)}
         required
       />
-      <select
-        value={cardType}
-        onChange={(e) => setCardType(e.target.value)}
-        required
-      >
-        <option value="基礎概念卡">基礎概念卡</option>
-        <option value="深入解析卡">深入解析卡</option>
-        <option value="關聯整合卡">關聯整合卡</option>
-      </select>
       <button type="submit">添加卡片</button>
     </form>
   );

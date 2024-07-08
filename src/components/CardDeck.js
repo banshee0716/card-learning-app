@@ -1,4 +1,10 @@
-import React, { useState, useEffect, useCallback, useMemo, useRef } from "react";
+import React, {
+  useState,
+  useEffect,
+  useCallback,
+  useMemo,
+  useRef,
+} from "react";
 import { useFlashcards } from "../FlashcardContext";
 import Card from "./Card";
 import AddCardForm from "./AddCardForm";
@@ -32,18 +38,9 @@ const CardDeck = () => {
     resetDeck();
   }, [currentTopic, currentCards, resetDeck]);
 
-  const getCardType = (index) => {
-    const totalCards = currentCards.length;
-    const basicThreshold = Math.floor(totalCards * 0.3);
-    const advancedThreshold = Math.floor(totalCards * 0.8);
-
-    if (index < basicThreshold) {
-      return "基礎概念卡";
-    } else if (index < advancedThreshold) {
-      return "深入解析卡";
-    } else {
-      return "關聯整合卡";
-    }
+  // 新的 getCardType 函數
+  const getCardType = (card) => {
+    return card.cardType || "基礎概念卡"; // 如果沒有指定類型，默認為基礎概念卡
   };
 
   const nextCard = useCallback(() => {
@@ -51,7 +48,9 @@ const CardDeck = () => {
       setIsAnimating(true);
       setDirection("left");
       setTimeout(() => {
-        setCurrentCardIndex((prevIndex) => (prevIndex + 1) % currentCards.length);
+        setCurrentCardIndex(
+          (prevIndex) => (prevIndex + 1) % currentCards.length
+        );
         setIsFlipped(false);
         setTimeout(() => {
           setIsAnimating(false);
@@ -67,7 +66,8 @@ const CardDeck = () => {
       setDirection("right");
       setTimeout(() => {
         setCurrentCardIndex(
-          (prevIndex) => (prevIndex - 1 + currentCards.length) % currentCards.length
+          (prevIndex) =>
+            (prevIndex - 1 + currentCards.length) % currentCards.length
         );
         setIsFlipped(false);
         setTimeout(() => {
@@ -219,7 +219,7 @@ const CardDeck = () => {
               back={prevCardData.back}
               isFlipped={false}
               onClick={() => {}}
-              cardType={prevCardData.cardType || getCardType(currentCardIndex - 1)}
+              cardType={getCardType(prevCardData)}
             />
           </div>
         )}
@@ -230,7 +230,7 @@ const CardDeck = () => {
               back={currentCard.back}
               isFlipped={isFlipped}
               onClick={toggleFlip}
-              cardType={currentCard.cardType || getCardType(currentCardIndex)}
+              cardType={getCardType(currentCard)}
             />
           ) : (
             <div className="error-card">無效的卡片數據</div>
@@ -243,7 +243,7 @@ const CardDeck = () => {
               back={nextCardData.back}
               isFlipped={false}
               onClick={() => {}}
-              cardType={nextCardData.cardType || getCardType(currentCardIndex + 1)}
+              cardType={getCardType(nextCardData)}
             />
           </div>
         )}
@@ -298,7 +298,6 @@ const CardDeck = () => {
 };
 
 export default CardDeck;
-
 
 /*import React, { useState, useEffect, useCallback, useMemo } from "react";
 import { useFlashcards } from "../FlashcardContext";

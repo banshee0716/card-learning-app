@@ -40,8 +40,9 @@ export const FlashcardProvider = ({ children }) => {
   }, [cards, topics, currentTopic]);
 
   // 添加新卡片
+
   const addCard = (topic, newCard) => {
-    if (!newCard.front || !newCard.front.title) {
+    if (!newCard.front || !newCard.front.title || !newCard.cardType) {
       console.error("Invalid card structure");
       return;
     }
