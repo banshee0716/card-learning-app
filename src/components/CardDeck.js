@@ -38,19 +38,9 @@ const CardDeck = () => {
     resetDeck();
   }, [currentTopic, currentCards, resetDeck]);
 
-  //之後重寫，這部分處理很差，改寫Initial card的內容讓他可以自己寫入
-  const getCardType = (index) => {
-    const totalCards = currentCards.length;
-    const basicThreshold = Math.floor(totalCards * 0.3);
-    const advancedThreshold = Math.floor(totalCards * 0.8);
-
-    if (index < basicThreshold) {
-      return "基礎概念卡";
-    } else if (index < advancedThreshold) {
-      return "深入解析卡";
-    } else {
-      return "關聯整合卡";
-    }
+  // 新的 getCardType 函數
+  const getCardType = (card) => {
+    return card.cardType || "基礎概念卡"; // 如果沒有指定類型，默認為基礎概念卡
   };
 
   const nextCard = useCallback(() => {
@@ -229,9 +219,7 @@ const CardDeck = () => {
               back={prevCardData.back}
               isFlipped={false}
               onClick={() => {}}
-              cardType={
-                prevCardData.cardType || getCardType(currentCardIndex - 1)
-              }
+              cardType={getCardType(prevCardData)}
             />
           </div>
         )}
@@ -242,7 +230,7 @@ const CardDeck = () => {
               back={currentCard.back}
               isFlipped={isFlipped}
               onClick={toggleFlip}
-              cardType={currentCard.cardType || getCardType(currentCardIndex)}
+              cardType={getCardType(currentCard)}
             />
           ) : (
             <div className="error-card">無效的卡片數據</div>
@@ -255,9 +243,7 @@ const CardDeck = () => {
               back={nextCardData.back}
               isFlipped={false}
               onClick={() => {}}
-              cardType={
-                nextCardData.cardType || getCardType(currentCardIndex + 1)
-              }
+              cardType={getCardType(nextCardData)}
             />
           </div>
         )}

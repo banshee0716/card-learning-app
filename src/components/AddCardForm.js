@@ -23,10 +23,10 @@ const AddCardForm = ({ onAddCard }) => {
         metacognitionPrompt,
         selfExplanationPrompt,
       },
-      cardType,
+      cardType, // 新增這一行，將卡片類型加入新卡片數據中
     };
     onAddCard(newCard);
-    // Reset form fields
+    // 重置表單欄位
     setTitle("");
     setImageUrl("");
     setPoints(["", "", ""]);
