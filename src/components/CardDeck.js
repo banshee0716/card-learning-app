@@ -1,4 +1,10 @@
-import React, { useState, useEffect, useCallback, useMemo, useRef } from "react";
+import React, {
+  useState,
+  useEffect,
+  useCallback,
+  useMemo,
+  useRef,
+} from "react";
 import { useFlashcards } from "../FlashcardContext";
 import Card from "./Card";
 import AddCardForm from "./AddCardForm";
@@ -52,7 +58,9 @@ const CardDeck = () => {
       setIsAnimating(true);
       setDirection("left");
       setTimeout(() => {
-        setCurrentCardIndex((prevIndex) => (prevIndex + 1) % currentCards.length);
+        setCurrentCardIndex(
+          (prevIndex) => (prevIndex + 1) % currentCards.length
+        );
         setIsFlipped(false);
         setTimeout(() => {
           setIsAnimating(false);
@@ -68,7 +76,8 @@ const CardDeck = () => {
       setDirection("right");
       setTimeout(() => {
         setCurrentCardIndex(
-          (prevIndex) => (prevIndex - 1 + currentCards.length) % currentCards.length
+          (prevIndex) =>
+            (prevIndex - 1 + currentCards.length) % currentCards.length
         );
         setIsFlipped(false);
         setTimeout(() => {
@@ -220,7 +229,9 @@ const CardDeck = () => {
               back={prevCardData.back}
               isFlipped={false}
               onClick={() => {}}
-              cardType={prevCardData.cardType || getCardType(currentCardIndex - 1)}
+              cardType={
+                prevCardData.cardType || getCardType(currentCardIndex - 1)
+              }
             />
           </div>
         )}
@@ -244,7 +255,9 @@ const CardDeck = () => {
               back={nextCardData.back}
               isFlipped={false}
               onClick={() => {}}
-              cardType={nextCardData.cardType || getCardType(currentCardIndex + 1)}
+              cardType={
+                nextCardData.cardType || getCardType(currentCardIndex + 1)
+              }
             />
           </div>
         )}
@@ -299,7 +312,6 @@ const CardDeck = () => {
 };
 
 export default CardDeck;
-
 
 /*import React, { useState, useEffect, useCallback, useMemo } from "react";
 import { useFlashcards } from "../FlashcardContext";

@@ -4,7 +4,8 @@ export const initialCards = {
       front: {
         title: "光合作用的基本方程式",
         points: ["6CO₂ + 6H₂O → C₆H₁₂O₆ + 6O₂", "需要光能", "在葉綠體中進行"],
-        image:"https://lh5.googleusercontent.com/proxy/8itarnvMNYtEvIEpI7w1tT-l2dUQ9BMZh2Q_Ghdfjmnyv-boOGPkiHSOqK-ub8VNwtu377xipQtsvq6Nm75w34nHT51yhQ",
+        image:
+          "https://lh5.googleusercontent.com/proxy/8itarnvMNYtEvIEpI7w1tT-l2dUQ9BMZh2Q_Ghdfjmnyv-boOGPkiHSOqK-ub8VNwtu377xipQtsvq6Nm75w34nHT51yhQ",
       },
       back: {
         explanation:
@@ -48,6 +49,7 @@ export const initialCards = {
           "C₄植物：適應高溫高光強度",
           "克拉斯拉酸代謝（CAM）植物：夜間固定二氧化碳",
         ],
+        image: "https://img.yamol.tw/item/889001-0-5eb80f402ce1e.png",
       },
       back: {
         explanation:
@@ -315,7 +317,8 @@ export const initialCards = {
       },
       back: {
         explanation: "純測試用",
-        metacognitionPrompt: "思考一下這樣要怎麼做排版？",
+        metacognitionPrompt:
+          "《少年游》青衫磊落險峰行，玉壁月華明。馬疾香幽，崖高人遠，微步觳紋生。誰家子弟誰家院？無計悔多情。虎嘯龍吟，換巢鸞鳳，劍氣碧煙橫。《蘇幕遮》向來癡，從此醉，水榭聽香，指點群豪戲。劇飲千杯男兒事，杏子林中，商略平生義。昔時因，今日意，胡漢恩仇，須傾英雄淚。雖萬千人吾往矣，悄立雁門，絕壁無餘字。《破陣子》千里茫茫若夢，雙眸粲粲如星。塞上牛羊空許約，燭畔鬢雲有舊盟。莽蒼踏雪行。赤手屠熊搏虎，金戈蕩寇鏖兵。草木殘生顱鑄鐵，蟲豸凝寒掌作冰，揮灑縛豪英。《洞仙歌》輸贏成敗，又爭由人算。且自逍遙沒誰管，奈天昏地暗，斗轉星移。風驟緊，縹緲峰頭雲亂。紅顏彈指老，剎那芳華。夢裡真真語真幻，同一笑，到頭萬事俱空。糊塗醉，情長計短。解不了，名韁系嗔貪。卻試問，幾時把癡心斷？《水龍吟》燕雲十八飛騎，奔騰如虎風煙舉。老魔小丑，豈堪一擊，勝之不武。王霸雄圖，血海深仇，盡歸塵土。念枉求美眷，良緣安在？枯井底，暗泥處。酒罷問君三語，為誰開，茶花滿路？王孫落魄，怎生消得，楊枝玉露？敝屣榮華，浮雲生死，此身何懼？教單于折箭，六軍辟易，奮英雄怒",
         selfExplanationPrompt: "描述這個段落的技術原理和修正方式",
       },
     },
