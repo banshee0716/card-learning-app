@@ -45,20 +45,23 @@ function App() {
       <div className={`App ${isDarkMode ? "dark-mode" : ""}`}>
         <header className="App-header">
           <div className="header-left">
-            {/* 側邊欄切換按鈕
+            {/* 側邊欄切換按鈕*/}
             <button onClick={toggleSidebar} className="sidebar-toggle">
               {isSidebarOpen ? "≡" : "☰"}
             </button>
-            */}
             <h1>卡片式學習</h1>
           </div>
           <div className="header-right">
             {/* 主題切換組件 */}
             <ThemeToggle isDarkMode={isDarkMode} toggleTheme={toggleTheme} />
-            {/* 本地存儲管理器切換按鈕 
-            <button onClick={toggleStorageManager} className="storage-manager-toggle">
+            {/* 本地存儲管理器切換按鈕
+            <button
+              onClick={toggleStorageManager}
+              className="storage-manager-toggle"
+            >
               ⚙️
-            </button>*/}
+            </button>{" "}
+            */}
           </div>
         </header>
         <div className="App-content">

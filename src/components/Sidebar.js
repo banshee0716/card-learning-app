@@ -56,7 +56,7 @@ const Sidebar = ({ isOpen }) => {
           </li>
         ))}
       </ul>
-      {/* 添加新主題的表單 */}
+      {/* 添加新主題的表單 
       <form onSubmit={handleAddTopic} className="add-topic-form">
         <input
           type="text"
@@ -69,6 +69,7 @@ const Sidebar = ({ isOpen }) => {
           +
         </button>
       </form>
+      */}
     </nav>
   );
 };
