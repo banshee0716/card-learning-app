@@ -282,6 +282,7 @@ const CardDeck = () => {
         >
           &#8250;
         </button>
+        {/*
         <button
           onClick={handleDelete}
           className="nav-button delete"
@@ -289,8 +290,9 @@ const CardDeck = () => {
           disabled={currentCards.length === 0}
         >
           &#128465;
-        </button>
+        </button>*/}
       </div>
+      {/*
       <div className="button-group">
         <button
           onClick={() => setShowAddForm((prev) => !prev)}
@@ -298,7 +300,7 @@ const CardDeck = () => {
         >
           {showAddForm ? "隱藏表單" : "新增新卡片"}
         </button>
-      </div>
+      </div>*/}
       {showAddForm && <AddCardForm onAddCard={handleAddCard} />}
       <div className="keyboard-instructions">
         <span>使用鍵盤及滑鼠操作：</span>
